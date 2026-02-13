@@ -1,6 +1,7 @@
 """
 语义向量搜索模块
 基于Embedding模型实现语义级别的表和字段检索
+支持与自我学习引擎的集成
 """
 
 import numpy as np
@@ -402,9 +403,12 @@ class SemanticSearchEngine:
 
     def _get_index_path(self) -> str:
         """获取索引文件路径"""
-        index_dir = Path(settings.DATA_PATH) / "vector_index"
-        index_dir.mkdir(parents=True, exist_ok=True)
-        return str(index_dir / "db_semantic_index.pkl")
+        import os
+        # 使用相对于项目根目录的路径
+        current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        index_dir = os.path.join(current_dir, 'data', 'vector_index')
+        os.makedirs(index_dir, exist_ok=True)
+        return os.path.join(index_dir, "db_semantic_index.pkl")
 
     def _save_index(self):
         """保存索引到文件"""

@@ -65,15 +65,142 @@ class DatabaseContextInjector:
         self._load_if_needed()
         return self._parsed_modules or []
 
-    def generate_relevant_context(self, question: str) -> str:
+    def generate_relevant_context(self, question: str, use_hybrid: bool = True) -> str:
         """
         根据用户问题生成相关的数据库上下文
-        用于注入到大模型的系统提示词中
+        使用混合搜索（关键词 + 语义向量）提高匹配准确性
+
+        Args:
+            question: 用户问题
+            use_hybrid: 是否使用混合搜索模式
         """
         modules = self.get_modules()
         if not modules:
             return ""
 
+        if use_hybrid:
+            return self._generate_hybrid_context(question, modules)
+        else:
+            return self._generate_keyword_context(question, modules)
+
+    def _generate_hybrid_context(self, question: str, modules: List[ModuleInfo]) -> str:
+        """
+        使用混合搜索生成上下文（关键词 + 语义）
+        """
+        try:
+            semantic_engine = get_semantic_search_engine()
+
+            if semantic_engine.index_built:
+                semantic_results = semantic_engine.search(question, top_k=8)
+
+                keyword_results = self._keyword_search(question, modules)
+
+                hybrid_results = semantic_engine.search_with_fusion(
+                    question,
+                    keyword_results,
+                    top_k=6
+                )
+
+                if hybrid_results:
+                    return self._format_hybrid_results(hybrid_results, modules)
+
+            return self._generate_keyword_context(question, modules)
+
+        except Exception as e:
+            print(f"Hybrid search failed: {e}")
+            return self._generate_keyword_context(question, modules)
+
+    def _keyword_search(self, question: str, modules: List[ModuleInfo]) -> List[Dict[str, Any]]:
+        """关键词搜索"""
+        keywords = self._extract_keywords(question)
+        results = []
+
+        for module in modules:
+            for table in module.tables:
+                score = self._calculate_table_relevance(table, keywords)
+                if score > 0:
+                    matched_fields = []
+                    matched_enums = []
+
+                    for field in table.fields:
+                        if any(kw.lower() in field.name.lower() or
+                               (field.comment and kw.lower() in field.comment.lower())
+                               for kw in keywords):
+                            if field.name not in ['id', 'created_at', 'updated_at']:
+                                matched_fields.append(field.name)
+
+                    for enum_name in table.enums.keys():
+                        if any(kw.lower() in enum_name.lower() for kw in keywords):
+                            matched_enums.append(enum_name)
+
+                    results.append({
+                        'table_name': table.table_name,
+                        'table_comment': table.table_comment,
+                        'module_name': module.module_name,
+                        'score': float(score),
+                        'matched_fields': matched_fields,
+                        'matched_enums': matched_enums,
+                        'match_type': 'keyword'
+                    })
+
+        return results
+
+    def _format_hybrid_results(
+        self,
+        hybrid_results: List[SemanticSearchResult],
+        modules: List[ModuleInfo]
+    ) -> str:
+        """格式化混合搜索结果"""
+        if not hybrid_results:
+            return ""
+
+        context_lines = ["\n\n## 业务语义参考 (基于数据库描述):\n"]
+
+        module_tables: Dict[str, List[SemanticSearchResult]] = {}
+        for result in hybrid_results:
+            module_name = result.module_name
+            if module_name not in module_tables:
+                module_tables[module_name] = []
+            module_tables[module_name].append(result)
+
+        for module_name, tables in list(module_tables.items())[:3]:
+            context_lines.append(f"### {module_name}\n")
+
+            for result in tables[:3]:
+                context_lines.append(f"\n**{result.table_name}** ({result.table_comment}):\n")
+
+                table_info = self._get_table_by_name(result.table_name)
+                if table_info:
+                    if table_info.enums:
+                        enum_list = []
+                        for enum_name, values in table_info.enums.items():
+                            val_names = ', '.join([v.get('value', '') for v in values[:3]])
+                            enum_list.append(f"{enum_name}: {val_names}")
+                        if enum_list:
+                            context_lines.append(f"  状态类型: {'; '.join(enum_list)}\n")
+
+                    key_fields = []
+                    for field in table_info.fields[:5]:
+                        if field.comment and field.name not in ['id', 'created_at', 'updated_at']:
+                            key_fields.append(f"{field.name}({field.comment})")
+                    if key_fields:
+                        context_lines.append(f"  关键字段: {', '.join(key_fields)}\n")
+
+        return ''.join(context_lines)
+
+    def _get_table_by_name(self, table_name: str) -> Optional[TableInfo]:
+        """根据表名获取表信息"""
+        modules = self.get_modules()
+        for module in modules:
+            for table in module.tables:
+                if table.table_name.lower() == table_name.lower():
+                    return table
+        return None
+
+    def _generate_keyword_context(self, question: str, modules: List[ModuleInfo]) -> str:
+        """
+        仅使用关键词搜索生成上下文（原方法）
+        """
         keywords = self._extract_keywords(question)
         relevant_parts = []
 

@@ -25,20 +25,21 @@ def _get_injector():
     return _db_context_injector
 
 
-def get_db_context_for_prompt(question: str) -> str:
+def get_db_context_for_prompt(question: str, use_hybrid: bool = True) -> str:
     """
     根据用户问题获取相关的数据库描述上下文
-    用于注入到大模型的系统提示词中
-    
+    使用混合搜索（关键词 + 语义向量）提高匹配准确性
+
     Args:
         question: 用户自然语言问题
-        
+        use_hybrid: 是否使用混合搜索模式（默认True）
+
     Returns:
-        格式化的数据库上下文字符串，用于添加到提示词中
+        格式化的数据库上下文字符串
     """
     try:
         injector = _get_injector()
-        context = injector.generate_relevant_context(question)
+        context = injector.generate_relevant_context(question, use_hybrid=use_hybrid)
         return context
     except Exception as e:
         print(f"Failed to get db context: {e}")

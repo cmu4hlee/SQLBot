@@ -16,6 +16,8 @@ services:
       - ./data/sqlbot/file:/opt/sqlbot/data/file
       - ./data/sqlbot/images:/opt/sqlbot/images
       - ./data/sqlbot/logs:/opt/sqlbot/app/logs
+      - ./data/sqlbot/self_learning:/opt/sqlbot/data/self_learning
+      - ./data/sqlbot/vector_index:/opt/sqlbot/data/vector_index
       - ./data/postgresql:/var/lib/postgresql/data
 
 networks:
