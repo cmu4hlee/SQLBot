@@ -288,9 +288,12 @@ class DatabaseContextInjector:
 injector = DatabaseContextInjector()
 
 
-def get_db_context_for_prompt(question: str) -> str:
-    """获取用于注入到提示词的数据库上下文"""
-    return injector.generate_relevant_context(question)
+def get_db_context_for_prompt(question: str, use_hybrid: bool = True) -> str:
+    """
+    获取用于注入到提示词的数据库上下文
+    使用混合搜索（关键词 + 语义）提高匹配准确性
+    """
+    return injector.generate_relevant_context(question, use_hybrid=use_hybrid)
 
 
 def get_full_db_context() -> str:
