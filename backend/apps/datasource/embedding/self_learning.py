@@ -130,9 +130,20 @@ class SelfLearningEngine:
     def _get_data_path(self) -> str:
         """获取数据存储路径"""
         import os
-        # 使用相对于项目根目录的路径
-        current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        data_dir = os.path.join(current_dir, 'data', 'self_learning')
+        # 优先使用环境变量（用于 Docker 持久化）
+        if os.environ.get('SELF_LEARNING_DATA_PATH'):
+            data_dir = os.environ.get('SELF_LEARNING_DATA_PATH')
+        else:
+            # 使用相对于项目根目录的路径
+            current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+            data_dir = os.path.join(current_dir, 'data', 'self_learning')
+        
+        # 如果是容器内路径，检查是否是挂载点
+        if data_dir.startswith('/opt/sqlbot/data/'):
+            mount_path = f'/Users/cjlee/Desktop/Project/SQLbot{data_dir.replace("/opt/sqlbot", "")}'
+            if os.path.exists(mount_path) and os.path.ismount(mount_path):
+                data_dir = mount_path
+        
         os.makedirs(data_dir, exist_ok=True)
         return data_dir
 

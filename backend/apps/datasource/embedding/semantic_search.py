@@ -404,9 +404,20 @@ class SemanticSearchEngine:
     def _get_index_path(self) -> str:
         """获取索引文件路径"""
         import os
-        # 使用相对于项目根目录的路径
-        current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        index_dir = os.path.join(current_dir, 'data', 'vector_index')
+        # 优先使用环境变量（用于 Docker 持久化）
+        if os.environ.get('VECTOR_INDEX_PATH'):
+            index_dir = os.environ.get('VECTOR_INDEX_PATH')
+        else:
+            # 使用相对于项目根目录的路径
+            current_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+            index_dir = os.path.join(current_dir, 'data', 'vector_index')
+        
+        # 如果是容器内路径，检查是否是挂载点
+        if index_dir.startswith('/opt/sqlbot/data/'):
+            mount_path = f'/Users/cjlee/Desktop/Project/SQLbot{index_dir.replace("/opt/sqlbot", "")}'
+            if os.path.exists(mount_path) and os.path.ismount(mount_path):
+                index_dir = mount_path
+        
         os.makedirs(index_dir, exist_ok=True)
         return os.path.join(index_dir, "db_semantic_index.pkl")
 
