@@ -1,6 +1,7 @@
 import concurrent
 import json
 import os
+import re
 import traceback
 import urllib.parse
 import warnings
@@ -53,6 +54,18 @@ from common.utils.locale import I18n, I18nHelper
 from common.utils.utils import SQLBotLogUtil, extract_nested_json, prepare_for_orjson
 
 warnings.filterwarnings("ignore")
+
+try:
+    from apps.datasource.embedding.db_context_integration import (
+        get_db_context_for_prompt,
+        enhance_schema_with_context,
+        db_context_middleware,
+        is_db_context_available,
+        get_db_context_stats
+    )
+    DB_CONTEXT_AVAILABLE = True
+except ImportError:
+    DB_CONTEXT_AVAILABLE = False
 
 executor = ThreadPoolExecutor(max_workers=200)
 
@@ -205,6 +218,14 @@ class LLMService:
 
         self.choose_table_schema(session)
 
+        if DB_CONTEXT_AVAILABLE and self.chat_question.question:
+            try:
+                self.chat_question.db_context = get_db_context_for_prompt(self.chat_question.question)
+                SQLBotLogUtil.debug(f"Loaded DB context: {len(self.chat_question.db_context)} chars")
+            except Exception as e:
+                SQLBotLogUtil.warning(f"Failed to load DB context: {e}")
+                self.chat_question.db_context = ""
+
         last_sql_messages: List[dict[str, Any]] = self.generate_sql_logs[-1].messages if len(
             self.generate_sql_logs) > 0 else []
         if self.chat_question.regenerate_record_id:
@@ -337,17 +358,37 @@ class LLMService:
                                                                           OperationEnum.FILTER_SQL_EXAMPLE],
                                                                       full_message=example_list)
 
+    @staticmethod
+    def _strip_xml_tags(text: str) -> str:
+        if not text:
+            return ''
+        stripped = re.sub(r'<[^>]+>', ' ', text)
+        stripped = re.sub(r'\s+', ' ', stripped)
+        return stripped.strip()
+
+    def _build_embedding_question(self) -> str:
+        question = self.chat_question.question or ''
+        extras: list[str] = []
+        if self.chat_question.terminologies:
+            extras.append(self._strip_xml_tags(self.chat_question.terminologies))
+        if self.chat_question.data_training:
+            extras.append(self._strip_xml_tags(self.chat_question.data_training))
+        if extras:
+            question = question + '\n' + '\n'.join(extras)
+        return question
+
     def choose_table_schema(self, _session: Session):
         self.current_logs[OperationEnum.CHOOSE_TABLE] = start_log(session=_session,
                                                                   operate=OperationEnum.CHOOSE_TABLE,
                                                                   record_id=self.record.id,
                                                                   local_operation=True)
+        embedding_question = self._build_embedding_question()
         self.chat_question.db_schema = self.out_ds_instance.get_db_schema(
-            self.ds.id, self.chat_question.question) if self.out_ds_instance else get_table_schema(
+            self.ds.id, embedding_question) if self.out_ds_instance else get_table_schema(
             session=_session,
             current_user=self.current_user,
             ds=self.ds,
-            question=self.chat_question.question)
+            question=embedding_question)
 
         self.current_logs[OperationEnum.CHOOSE_TABLE] = end_log(session=_session,
                                                                 log=self.current_logs[OperationEnum.CHOOSE_TABLE],

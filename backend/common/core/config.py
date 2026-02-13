@@ -61,8 +61,13 @@ class Settings(BaseSettings):
     # SQLBOT_DB_URL: str = 'mysql+pymysql://root:Password123%40mysql@127.0.0.1:3306/sqlbot'
 
     TOKEN_KEY: str = "X-SQLBOT-TOKEN"
-    DEFAULT_PWD: str = "SQLBot@123456"
+    DEFAULT_PWD: str = "123"
     ASSISTANT_TOKEN_KEY: str = "X-SQLBOT-ASSISTANT-TOKEN"
+    OPEN_API_KEY: str = ""
+    OPEN_API_USERNAME: str = ""
+    OPEN_API_PASSWORD: str = ""
+    OPEN_PUBLIC_ENABLED: bool = True
+    OPEN_PUBLIC_USERNAME: str = "admin"
 
     CACHE_TYPE: Literal["redis", "memory", "None"] = "memory"
     CACHE_REDIS_URL: str | None = None  # Redis URL, e.g., "redis://[[username]:[password]]@localhost:6379/0"
@@ -122,6 +127,8 @@ class Settings(BaseSettings):
 
     TABLE_EMBEDDING_ENABLED: bool = True
     TABLE_EMBEDDING_COUNT: int = 10
+    TABLE_EMBEDDING_MIN_SIMILARITY: float = 0.25
+    TABLE_EMBEDDING_FALLBACK_COUNT: int = 150
     DS_EMBEDDING_COUNT: int = 10
 
     ORACLE_CLIENT_PATH: str = '/opt/sqlbot/db_client/oracle_instant_client'
@@ -132,6 +139,7 @@ class Settings(BaseSettings):
                      'PARSE_REASONING_BLOCK_ENABLED',
                      'PG_POOL_PRE_PING',
                      'TABLE_EMBEDDING_ENABLED',
+                     'OPEN_PUBLIC_ENABLED',
                      mode='before')
     @classmethod
     def lowercase_bool(cls, v: Any) -> Any:

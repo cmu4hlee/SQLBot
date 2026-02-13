@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import icon_add_outlined from '@/assets/svg/icon_add_outlined.svg'
 import { reactive, ref, toRefs, onBeforeMount, computed } from 'vue'
 import { load_resource_prepare } from '@/views/dashboard/utils/canvasUtils'
-import { Icon } from '@/components/icon-custom'
 import ResourceTree from '@/views/dashboard/common/ResourceTree.vue'
 import SQPreview from '@/views/dashboard/preview/SQPreview.vue'
 import SQPreviewHead from '@/views/dashboard/preview/SQPreviewHead.vue'
@@ -46,10 +44,6 @@ const hasTreeData = computed(() => {
 const mounted = computed(() => {
   return resourceTreeRef.value?.mounted
 })
-function createNew() {
-  resourceTreeRef.value?.createNewObject()
-}
-
 const stateInit = () => {
   state.canvasDataPreview = []
   state.canvasStylePreview = {}
@@ -134,16 +128,7 @@ defineExpose({
         <EmptyBackgroundSvg :description="t('dashboard.select_dashboard_tips')" />
       </template>
       <template v-else-if="mounted">
-        <EmptyBackground :description="t('dashboard.no_dashboard_info')" img-type="none">
-          <el-button type="primary" @click="createNew">
-            <template #icon>
-              <Icon name="icon_add_outlined">
-                <icon_add_outlined class="svg-icon" />
-              </Icon>
-            </template>
-            {{ t('dashboard.new_dashboard') }}
-          </el-button>
-        </EmptyBackground>
+        <EmptyBackground :description="t('dashboard.no_dashboard_info')" img-type="none" />
       </template>
     </el-container>
   </div>

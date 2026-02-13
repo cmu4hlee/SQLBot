@@ -5,7 +5,6 @@ import LayoutDsl from '@/components/layout/LayoutDsl.vue'
 import SinglePage from '@/components/layout/SinglePage.vue'
 import login from '@/views/login/index.vue'
 import chat from '@/views/chat/index.vue'
-import DashboardEditor from '@/views/dashboard/editor/index.vue'
 import DashboardPreview from '@//views/dashboard/preview/SQPreviewSingle.vue'
 import Dashboard from '@/views/dashboard/index.vue'
 import Model from '@/views/system/model/Model.vue'
@@ -32,6 +31,7 @@ import User from '@/views/system/user/User.vue'
 import Workspace from '@/views/system/workspace/index.vue'
 import Page401 from '@/views/error/index.vue'
 import ChatPreview from '@/views/chat/preview.vue'
+import ZcglChat from '@/views/open/ZcglChat.vue'
 
 import { i18n } from '@/i18n'
 import { watchRouter } from './watch'
@@ -68,6 +68,17 @@ export const routes = [
         name: 'dsTable',
         component: () => import('@/views/ds/TableList.vue'),
         props: true,
+      },
+    ],
+  },
+  {
+    path: '/zcgl',
+    component: SinglePage,
+    children: [
+      {
+        path: '',
+        name: 'zcglChat',
+        component: ZcglChat,
       },
     ],
   },
@@ -146,12 +157,6 @@ export const routes = [
         meta: { title: t('prompt.customize_prompt_words') },
       },
     ],
-  },
-  {
-    path: '/canvas',
-    name: 'canvas',
-    component: DashboardEditor,
-    meta: { title: 'canvas', icon: 'dashboard' },
   },
   {
     path: '/dashboard-preview',

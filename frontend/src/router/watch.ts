@@ -11,7 +11,7 @@ const appearanceStore = useAppearanceStoreWithOut()
 const userStore = useUserStore()
 const { wsCache } = useCache()
 const whiteList = ['/login', '/admin-login']
-const assistantWhiteList = ['/assistant', '/embeddedPage', '/embeddedCommon', '/401']
+const assistantWhiteList = ['/assistant', '/embeddedPage', '/embeddedCommon', '/401', '/zcgl']
 
 const wsAdminRouterList = ['/ds/index', '/as/index']
 export const watchRouter = (router: Router) => {

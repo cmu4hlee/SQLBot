@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import icon_pc_outlined from '@/assets/svg/icon_pc_outlined.svg'
-import icon_edit_outlined from '@/assets/svg/icon_edit_outlined.svg'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const preview = () => {
   window.open(`#/dashboard-preview?resourceId=${props.dashboardInfo.id}`, '_blank')
-}
-const edit = () => {
-  window.open(`#/canvas?resourceId=${props.dashboardInfo.id}`, '_self')
 }
 const props = defineProps({
   dashboardInfo: {
@@ -29,14 +25,6 @@ const props = defineProps({
           </icon>
         </template>
         {{ t('dashboard.preview') }}
-      </el-button>
-      <el-button class="custom-button" type="primary" @click="edit">
-        <template #icon>
-          <Icon name="icon_edit_outlined">
-            <icon_edit_outlined class="svg-icon" />
-          </Icon>
-        </template>
-        {{ t('dashboard.edit') }}
       </el-button>
     </div>
   </div>

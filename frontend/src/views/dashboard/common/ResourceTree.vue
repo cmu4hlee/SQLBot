@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import icon_add_outlined from '@/assets/svg/icon_add_outlined.svg'
 import { treeDraggableChart } from '@/views/dashboard/utils/treeDraggableChart'
 import icon_searchOutline_outlined from '@/assets/svg/icon_search-outline_outlined.svg'
 import icon_folder from '@/assets/svg/icon_folder.svg'
-import ope_add from '@/assets/svg/operate/ope-add.svg'
 import icon_dashboard from '@/assets/permission/icon_dashboard.svg'
-import icon_edit_outlined from '@/assets/svg/icon_edit_outlined.svg'
 import icon_rename from '@/assets/svg/icon_rename.svg'
 import icon_delete from '@/assets/svg/icon_delete.svg'
 import icon_more_outlined from '@/assets/svg/icon_more_outlined.svg'
@@ -65,11 +62,6 @@ const state = reactive({
   sortType: [],
   templateCreatePid: 0,
   menuList: [
-    {
-      label: t('dashboard.edit'),
-      command: 'edit',
-      svgName: icon_edit_outlined,
-    },
     {
       label: t('dashboard.rename'),
       command: 'rename',
@@ -163,15 +155,6 @@ const afterTreeInit = () => {
 const copyLoading = ref(false)
 const emit = defineEmits(['nodeClick', 'deleteCurResource'])
 
-function createNewObject() {
-  addOperation({ opt: 'newLeaf' })
-}
-
-// @ts-expect-error eslint-disable-next-line @typescript-eslint/ban-ts-comment
-const resourceEdit = (resourceId) => {
-  window.open(`#/canvas?resourceId=${resourceId}`, '_self')
-}
-
 // @ts-expect-error eslint-disable-next-line @typescript-eslint/ban-ts-comment
 const getParentKeys = (tree: any, targetKey: any, parentKeys = []) => {
   for (const node of tree) {
@@ -209,17 +192,6 @@ onMounted(() => {
   getTree()
 })
 
-const addOperation = (params: any) => {
-  if (params.opt === 'newLeaf') {
-    const newCanvasUrl = '#/canvas?opt=create' + (params?.id ? `&pid=${params?.id}` : '')
-    window.open(newCanvasUrl, '_self')
-    dashboardStore.canvasDataInit()
-  } else {
-    // @ts-expect-error eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    resourceGroupOptRef.value?.optInit(params)
-  }
-}
-
 const operation = (opt: string, data: SQTreeNode) => {
   if (opt === 'delete') {
     const msg = data.node_type === 'leaf' ? '' : t('dashboard.delete_tips')
@@ -240,8 +212,6 @@ const operation = (opt: string, data: SQTreeNode) => {
   } else if (opt === 'rename') {
     // @ts-expect-error eslint-disable-next-line @typescript-eslint/ban-ts-comment
     resourceGroupOptRef.value?.optInit({ opt: 'rename', id: data.id, name: data.name })
-  } else if (opt === 'edit') {
-    resourceEdit(data.id)
   }
 }
 
@@ -312,7 +282,6 @@ const sortTypeTip = computed(() => {
 
 defineExpose({
   hasData,
-  createNewObject,
   mounted,
 })
 </script>
@@ -322,21 +291,6 @@ defineExpose({
     <div class="tree-header">
       <div class="icon-methods">
         <span class="title">{{ t('dashboard.dashboard') }} </span>
-        <el-tooltip
-          :offset="12"
-          :content="t('dashboard.new_dashboard')"
-          placement="top"
-          effect="dark"
-        >
-          <el-icon
-            class="custom-icon btn hover-icon_with_bg primary-icon"
-            @click="addOperation({ opt: 'newLeaf', type: 'dashboard' })"
-          >
-            <Icon name="dv-new-folder">
-              <ope_add class="svg-icon" />
-            </Icon>
-          </el-icon>
-        </el-tooltip>
       </div>
       <el-input
         v-model="filterText"
@@ -429,14 +383,6 @@ defineExpose({
               {{ node.label }}
             </span>
             <div class="icon-more">
-              <el-icon
-                v-if="data.node_type !== 'leaf'"
-                class="hover-icon"
-                @click.stop
-                @click="addOperation({ opt: 'newLeaf', type: 'dashboard', id: data.id })"
-              >
-                <Icon><icon_add_outlined class="svg-icon" /></Icon>
-              </el-icon>
               <HandleMore
                 :menu-list="state.menuList"
                 :icon-name="icon_more_outlined"

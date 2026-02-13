@@ -74,6 +74,8 @@ def save_table_embedding(session_maker, ids: List[int]):
             table_comment = ''
             if table.custom_comment:
                 table_comment = table.custom_comment.strip()
+            elif table.table_comment:
+                table_comment = table.table_comment.strip()
             if table_comment == '':
                 schema_table += '\n[\n'
             else:
@@ -85,6 +87,8 @@ def save_table_embedding(session_maker, ids: List[int]):
                     field_comment = ''
                     if field.custom_comment:
                         field_comment = field.custom_comment.strip()
+                    elif field.field_comment:
+                        field_comment = field.field_comment.strip()
                     if field_comment == '':
                         field_list.append(f"({field.field_name}:{field.field_type})")
                     else:
@@ -129,6 +133,8 @@ def save_ds_embedding(session_maker, ids: List[int]):
                 table_comment = ''
                 if table.custom_comment:
                     table_comment = table.custom_comment.strip()
+                elif table.table_comment:
+                    table_comment = table.table_comment.strip()
                 if table_comment == '':
                     schema_table += '\n[\n'
                 else:
@@ -140,6 +146,8 @@ def save_ds_embedding(session_maker, ids: List[int]):
                         field_comment = ''
                         if field.custom_comment:
                             field_comment = field.custom_comment.strip()
+                        elif field.field_comment:
+                            field_comment = field.field_comment.strip()
                         if field_comment == '':
                             field_list.append(f"({field.field_name}:{field.field_type})")
                         else:

@@ -448,6 +448,8 @@ def get_table_schema(session: SessionDep, current_user: CurrentUser, ds: CoreDat
         table_comment = ''
         if obj.table.custom_comment:
             table_comment = obj.table.custom_comment.strip()
+        elif obj.table.table_comment:
+            table_comment = obj.table.table_comment.strip()
         if table_comment == '':
             schema_table += '\n[\n'
         else:
@@ -459,6 +461,8 @@ def get_table_schema(session: SessionDep, current_user: CurrentUser, ds: CoreDat
                 field_comment = ''
                 if field.custom_comment:
                     field_comment = field.custom_comment.strip()
+                elif field.field_comment:
+                    field_comment = field.field_comment.strip()
                 if field_comment == '':
                     field_list.append(f"({field.field_name}:{field.field_type})")
                 else:

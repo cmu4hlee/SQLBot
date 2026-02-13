@@ -60,7 +60,7 @@ If you are in an intranet environment, you can deploy SQLBot via the [offline in
 
 - Open in your browser: http://<your server IP>:8000/
 - Username: admin
-- Password: SQLBot@123456
+- Password: 123
 
 
 ## UI Display

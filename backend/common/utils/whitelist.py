@@ -21,8 +21,9 @@ wlist = [
     "*.ttf",
     "*.eot",
     "*.otf",
-    "*.css.map"
+    "*.css.map",
     "/mcp*",
+    "/open/*",
     "/system/license",
     "/system/config/key",
     "/images/*",
@@ -38,7 +39,9 @@ wlist = [
     "/system/authentication/sso/*",
     "/system/platform/sso/*",
     "/system/platform/client/*",
-    "/system/parameter/login"
+    "/system/parameter/login",
+    "/embeddedPage*",
+    "/embeddedCommon*"
 ]
 
 class WhitelistChecker:

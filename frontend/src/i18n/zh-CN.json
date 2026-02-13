@@ -156,7 +156,7 @@
     "to_continue_saving": "选择的数据表数量为：{msg}，已超出30，可能会导致操作超时或者无响应，是否继续保存？",
     "proceed_with_caution": "删除后无法恢复，请谨慎操作。",
     "sales_in_2024": "是否删除对话：{msg}？",
-    "limited_to_30": "数据表数量限制30",
+    "limited_to_30": "数据表数量限制150",
     "enter_your_password": "请输入密码",
     "your_account_email_address": "请输入账号/邮箱",
     "the_correct_password": "请输入正确的密码",

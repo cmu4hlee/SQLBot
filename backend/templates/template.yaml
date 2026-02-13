@@ -229,6 +229,9 @@ template:
                 <description>查询SQL时若作为查询条件，将"中国"作为查询用的值</description>
             </terminology>
         </terminologies>
+        <db_context>
+        {db_context}
+        </db_context>
         </Info>
       
         <chat-examples>

@@ -132,8 +132,8 @@ const saveResource = (params: any, commonParams: any) => {
 }
 
 const callbackExportSuc = (curOptDashboardIdValue: any) => {
-  // do open dashboard
-  const url = `#/canvas?resourceId=${curOptDashboardIdValue}`
+  // open dashboard preview
+  const url = `#/dashboard?dashboardId=${curOptDashboardIdValue}`
   window.open(url, '_self')
 }
 

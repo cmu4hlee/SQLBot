@@ -227,6 +227,7 @@ class AiModelQuestion(BaseModel):
     custom_prompt: str = ""
     error_msg: str = ""
     regenerate_record_id: Optional[int] = None
+    db_context: str = ""
 
     def sql_sys_question(self, db_type: Union[str, DB], enable_query_limit: bool = True):
         _sql_template = get_sql_example_template(db_type)
@@ -247,6 +248,7 @@ class AiModelQuestion(BaseModel):
         return _base_template['system'].format(engine=self.engine, schema=self.db_schema, question=self.question,
                                                lang=self.lang, terminologies=self.terminologies,
                                                data_training=self.data_training, custom_prompt=self.custom_prompt,
+                                               db_context=self.db_context,
                                                process_check=_process_check,
                                                base_sql_rules=_base_sql_rules,
                                                basic_sql_examples=_sql_examples,

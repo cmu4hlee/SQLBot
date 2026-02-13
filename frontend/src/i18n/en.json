@@ -156,7 +156,7 @@
     "to_continue_saving": "The number of selected tables is 67, exceeding {msg}. This may cause the operation to time out or become unresponsive. Do you want to continue saving?",
     "proceed_with_caution": "Deletion is irreversible, so proceed with caution.",
     "sales_in_2024": "Delete conversation: {msg}?",
-    "limited_to_30": "The number of data tables is limited to 30",
+    "limited_to_30": "The number of data tables is limited to 150",
     "enter_your_password": "Please enter your password",
     "your_account_email_address": "Please enter your account/email address",
     "the_correct_password": "Please enter the correct password",

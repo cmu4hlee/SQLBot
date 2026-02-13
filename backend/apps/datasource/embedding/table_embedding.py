@@ -31,7 +31,11 @@ def get_table_embedding(tables: list[dict], question: str):
                 _list[index]['cosine_similarity'] = cosine_similarity(q_embedding, item)
 
             _list.sort(key=lambda x: x['cosine_similarity'], reverse=True)
-            _list = _list[:settings.TABLE_EMBEDDING_COUNT]
+            max_similarity = _list[0]['cosine_similarity'] if _list else 0.0
+            limit = settings.TABLE_EMBEDDING_COUNT
+            if settings.TABLE_EMBEDDING_FALLBACK_COUNT > 0 and max_similarity < settings.TABLE_EMBEDDING_MIN_SIMILARITY:
+                limit = min(settings.TABLE_EMBEDDING_FALLBACK_COUNT, len(_list))
+            _list = _list[:limit]
             # print(len(_list))
             SQLBotLogUtil.info(json.dumps(_list))
             return _list
@@ -65,7 +69,11 @@ def calc_table_embedding(tables: list[dict], question: str):
                     _list[index]['cosine_similarity'] = cosine_similarity(q_embedding, json.loads(item))
 
             _list.sort(key=lambda x: x['cosine_similarity'], reverse=True)
-            _list = _list[:settings.TABLE_EMBEDDING_COUNT]
+            max_similarity = _list[0]['cosine_similarity'] if _list else 0.0
+            limit = settings.TABLE_EMBEDDING_COUNT
+            if settings.TABLE_EMBEDDING_FALLBACK_COUNT > 0 and max_similarity < settings.TABLE_EMBEDDING_MIN_SIMILARITY:
+                limit = min(settings.TABLE_EMBEDDING_FALLBACK_COUNT, len(_list))
+            _list = _list[:limit]
             # print(len(_list))
             end_time = time.time()
             SQLBotLogUtil.info(str(end_time - start_time))

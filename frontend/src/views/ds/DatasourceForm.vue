@@ -253,7 +253,7 @@ const save = async (formEl: FormInstance | undefined) => {
           return { table_name: ele.tableName, table_comment: ele.tableComment }
         })
 
-      if (checkTableList.value.length > 30) {
+      if (checkTableList.value.length > 150) {
         const excessive = await ElMessageBox.confirm(t('common.excessive_tables_selected'), {
           tip: t('common.to_continue_saving', { msg: checkTableList.value.length }),
           confirmButtonText: t('common.save'),
